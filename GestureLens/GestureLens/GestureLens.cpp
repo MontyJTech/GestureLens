@@ -5,17 +5,16 @@
 #include <conio.h>
 #include <vector>
 
-#include "GestureType.h"
 #include "GestureUtils.h"
 #include "LetterList.h"
 
 bool InitializeLeapDevice(LEAP_CONNECTION* connection, LEAP_CONNECTION_MESSAGE* message);
-bool UserRequestQuit();
-const char* GetLetterFromPose(const LEAP_TRACKING_EVENT* frame);
+bool UserInput();
+bool ShouldPrintLetter(const Letter* prevLetter, const Letter* nextLetter);
 
-void print_vector(const char* label, LEAP_VECTOR v) {
-	std::cout << label << ": (" << v.x << ", " << v.y << ", " << v.z << ")" << std::endl;
-}
+const int charResetMaxCount = 100;
+int charResetCounter = 0;
+bool charReset = true;
 
 int main()
 {
@@ -26,42 +25,56 @@ int main()
 		return -1;
 	}
 
+	const Letter* prevLetter = &LetterList::None;
+	const Letter* foundLetter = &LetterList::None;
+
+	const int letterPrintTimeoutFrames = 30;
+	int frameCounter = 0;
+
 	while (true) {
 		if (LeapPollConnection(connection, 100, &message) == eLeapRS_Success) {
-			if (UserRequestQuit()) {
+			if (UserInput()) {
 				std::cout << "Exiting loop.\n";
 				break;
 			}
 			if (message.type == eLeapEventType_Tracking) {
+				foundLetter = &LetterList::None;
 				const LEAP_TRACKING_EVENT* frame = message.tracking_event;
-				std::vector<Letter> availableLetters = std::vector<Letter>();
-
+				HistoryManager::AddFrameDataToHistory(frame);
 				if (frame->nHands == 0) {
 					continue;
 				}
+				if (frameCounter < letterPrintTimeoutFrames) {
+					frameCounter++;
+					continue;
+				}
+
+				GestureType gestureOne = GestureTypeUtils::GetGestureForLeapHand(&frame->pHands[0]);
+				GestureType gestureTwo = frame->nHands == 2 ? GestureTypeUtils::GetGestureForLeapHand(&frame->pHands[1]) : GestureType::NONE;
+
+				LEAP_HAND* hOne = &frame->pHands[0];
+				LEAP_HAND* hTwo = frame->nHands == 2 ? &frame->pHands[1] : nullptr;
 
 				for (int i = 0; i < LetterList::NUM_LETTERS; i++) {
-					GestureType gestureOne = GestureTypeUtils::GetGestureForLeapHand(&frame->pHands[0]);
-					GestureType gestureTwo;
-					if (frame->nHands == 2) {
-						gestureTwo = GestureTypeUtils::GetGestureForLeapHand(&frame->pHands[1]);
-					}
-					else {
-						gestureTwo = GestureType::NONE;
-					}
 					if (LetterList::arr[i].CheckGesturesCondition(gestureOne, gestureTwo)) {
-						availableLetters.push_back(LetterList::arr[i]);
+						if (LetterList::arr[i].CheckCustomCondition(hOne, hTwo)) {
+							foundLetter = &LetterList::arr[i];
+							break;
+						}
 					}
 				}
 
-				std::cout << "\rAvailable Letters: ";
-				for (int i = 0; i < availableLetters.size(); i++) {
-					std::cout << availableLetters[i].GetChar();
-					if (i < availableLetters.size() - 1) {
-						std::cout << ", ";
-					}
+				
+				if(foundLetter->GetChar() != '-') {
+					std::cout << foundLetter->GetChar();
+					prevLetter = foundLetter;
+					frameCounter = 0;
 				}
-				std::cout << "                                                           ";
+				//if (ShouldPrintLetter(prevLetter, foundLetter)) {
+				//	prevLetter = foundLetter;
+				//	charReset = false;
+				//	std::cout << foundLetter->GetChar();
+				//}
 			}
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -102,9 +115,16 @@ bool InitializeLeapDevice(LEAP_CONNECTION* connection, LEAP_CONNECTION_MESSAGE* 
 	return result == eLeapRS_Success;
 }
 
-bool UserRequestQuit() {
+bool UserInput() {
 	if (_kbhit()) {
 		char c = _getch();  // Read character without waiting for Enter
+		if (c == 'c') {
+			std::cout << "\x1b[2K"; // Delete current line
+			std::cout << "\r";
+		}
+		if (c == ' ') {
+			std::cout << " ";
+		}
 		if (c == 'q') {
 			return true;
 		}
@@ -112,6 +132,35 @@ bool UserRequestQuit() {
 	return false;
 }
 
-const char* GetLetterFromPose(const LEAP_TRACKING_EVENT* frame) {
-	return "-";
+bool ShouldPrintLetter(const Letter* prevLetter, const Letter* nextLetter) {
+
+	if (nextLetter->GetChar() != '-') {
+		if (nextLetter->GetChar() != prevLetter->GetChar()) {
+			return true;
+		}
+		else if (charReset) {
+			return true;
+		}
+		else if(charResetCounter == charResetMaxCount){
+			charResetCounter = 0;
+			charReset = true;
+			return true;
+		}
+		else{
+			charResetCounter++;
+			return false;
+		}
+	}
+	else {
+		if (!charReset) {
+			if (charResetCounter == charResetMaxCount) {
+				charResetCounter = 0;
+				charReset = true;
+			}
+			else {
+				charResetCounter++;
+			}
+		}
+		return false;
+	}
 }

@@ -133,9 +133,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GestureLens.cpp" />
-    <ClCompile Include="Hand.cpp" />
     <ClCompile Include="Letter.cpp" />
-    <ClCompile Include="LetterPoseSampleEngine.cpp" />
     <ClCompile Include="GestureUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -143,10 +141,9 @@
     <ClInclude Include="Gesture.h" />
     <ClInclude Include="GestureType.h" />
     <ClInclude Include="GestureUtils.h" />
-    <ClInclude Include="Hand.h" />
+    <ClInclude Include="HistoryManager.h" />
     <ClInclude Include="Letter.h" />
     <ClInclude Include="LetterList.h" />
-    <ClInclude Include="LetterPoseSampleEngine.h" />
     <ClInclude Include="MathUtils.h" />
     <ClInclude Include="PoseStructs.h" />
   </ItemGroup>
