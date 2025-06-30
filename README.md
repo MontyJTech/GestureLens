@@ -12,12 +12,12 @@ The system is fully hand-agnostic — all gestures work with either hand in any 
 A demonstration of the full alphabet using the phrase:  
 *"The quick brown fox jumps over the lazy dog"*
 
-![Full Alphabet Demo](Media/alphabet.gif)
+![Full Alphabet Demo](./Media/alphabet.gif)
 
 **Hand Agnostic**  
 Shows both hands performing vowel gestures (`aeiouaeiou`), verifying recognition consistency.
 
-![Vowel Demo](Media/vowels.gif)
+![Vowel Demo](./Media/vowels.gif)
 
 ---
 
