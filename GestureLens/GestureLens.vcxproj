@@ -137,15 +137,12 @@
     <ClCompile Include="GestureUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FingerSpread.h" />
-    <ClInclude Include="Gesture.h" />
     <ClInclude Include="GestureType.h" />
     <ClInclude Include="GestureUtils.h" />
     <ClInclude Include="HistoryManager.h" />
     <ClInclude Include="Letter.h" />
     <ClInclude Include="LetterList.h" />
     <ClInclude Include="MathUtils.h" />
-    <ClInclude Include="PoseStructs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

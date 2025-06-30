@@ -61,10 +61,8 @@ bool GestureTypeUtils::IsHandInCurvedIndexState(LEAP_HAND* hand) {
 	bool middleNotOpen = !IsFingerInOpenState(&hand->digits[2]);
 	bool ringNotOpen = !IsFingerInOpenState(&hand->digits[3]);
 
-	//bool middleClosed= IsFingerInClosedState(&hand->digits[2]);
-	//bool ringClosed = IsFingerInClosedState(&hand->digits[3]);
 
-	return indexCurved && middleNotOpen && ringNotOpen;//&& pinkyClosed;
+	return indexCurved && middleNotOpen && ringNotOpen;
 }
 
 bool GestureTypeUtils::IsHandInIndexMiddleState(LEAP_HAND* hand)
@@ -131,7 +129,7 @@ bool GestureTypeUtils::IsFingerInClosedState(LEAP_DIGIT* finger) {
 	LEAP_VECTOR jointTwoDir;
 	float similarity = 100;
 
-	if (finger->finger_id == 0) { //is thumb - can't use metacarpel bone.
+	if (finger->finger_id == 0) { //is thumb - can't use metacarpal bone.
 		jointOneDir = MathUtils::Direction(finger->distal.prev_joint, finger->distal.next_joint);
 		jointTwoDir = MathUtils::Direction(finger->proximal.prev_joint, finger->proximal.next_joint);
 		similarity = MathUtils::CosSimilarity(jointOneDir, jointTwoDir);
@@ -145,13 +143,13 @@ bool GestureTypeUtils::IsFingerInClosedState(LEAP_DIGIT* finger) {
 	return similarity < CLOSED_FINGER_ANGLE_THRESHOLD;
 }
 
-bool GestureTypeUtils::AreFingersSpread(LEAP_DIGIT* fingers, int fingerCount)
+bool GestureTypeUtils::AreFingersSpread(LEAP_HAND* hand)
 {
 	float distanceAverage = 0;
-	for (int i = 0; i < fingerCount-1; i++) {
-		distanceAverage += MathUtils::Distance(fingers[i].distal.next_joint, fingers[i+1].distal.next_joint);
+	for (int i = 1; i < NUM_GAPS_BETWEEN_FINGERS + 1; i++) {
+		distanceAverage += MathUtils::Distance(hand->digits[i].distal.next_joint, hand->digits[i + 1].distal.next_joint);
 	}
-	distanceAverage /= (fingerCount-1);
+	distanceAverage /= NUM_GAPS_BETWEEN_FINGERS;
 
 	return distanceAverage > FINGER_SPREAD_DISTANCE_THRESHOLD;
 }
@@ -181,8 +179,6 @@ bool GestureTypeUtils::HPalmCrossDetectedInHistory(bool isLeftSupportHand) {
 	return true;
 }
 
-//List of hit marks = { wrist position, palm position, middle proximal prev, middle distal next }
-
 bool GestureTypeUtils::JCurveDetectedInHistory(bool isLeftSupportHand)
 {
 	std::deque<LEAP_HAND>* support = isLeftSupportHand ? &HistoryManager::leftHand : &HistoryManager::rightHand;
@@ -190,7 +186,7 @@ bool GestureTypeUtils::JCurveDetectedInHistory(bool isLeftSupportHand)
 
 	int counter = support->size() - 1;
 	bool entryPointFound = false;
-	//Find entry point
+
 	while (counter >= 0) {
 		LEAP_HAND* supportHand = &support->at(counter);
 		LEAP_HAND* dominantHand = &dominant->at(counter);
@@ -204,7 +200,6 @@ bool GestureTypeUtils::JCurveDetectedInHistory(bool isLeftSupportHand)
 
 	if (entryPointFound && counter < support->size() - 5) {
 		int jArraySize = support->size() - 1 - counter;
-		//int jSplit = jArraySize * 2 / 3;
 		int jSplit = jArraySize / 2;
 
 		std::deque<LEAP_HAND> jStraightDomSubset(dominant->end() - jSplit, dominant->end());

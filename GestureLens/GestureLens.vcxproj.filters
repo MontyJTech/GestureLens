@@ -29,12 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PoseStructs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Gesture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GestureType.h">
       <Filter>Enums</Filter>
     </ClInclude>
@@ -43,9 +37,6 @@
     </ClInclude>
     <ClInclude Include="GestureUtils.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FingerSpread.h">
-      <Filter>Enums</Filter>
     </ClInclude>
     <ClInclude Include="Letter.h">
       <Filter>Header Files</Filter>

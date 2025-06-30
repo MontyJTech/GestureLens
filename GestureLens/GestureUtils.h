@@ -3,10 +3,8 @@
 #include "HistoryManager.h"
 #include "GestureType.h"
 #include "MathUtils.h"
-#include "FingerSpread.h"
 
 #include <string>
-#include <iostream>
 
 class GestureTypeUtils {
 public:
@@ -20,6 +18,8 @@ public:
 	inline static const float CLOSED_FINGER_ANGLE_THRESHOLD = -0.2f;
 	inline static const float TIGHT_SPREAD_THRESHOLD = 0.0f;
 	
+	inline static const int NUM_GAPS_BETWEEN_FINGERS = 3;
+
 	inline static bool secondGestureDominant = true;
 
 	static GestureType GetGestureForLeapHand(LEAP_HAND* hand);
@@ -39,12 +39,10 @@ public:
 
 	static bool IsFingerInOpenState(LEAP_DIGIT* finger);
 	static bool IsFingerInClosedState(LEAP_DIGIT* finger);
-	static bool AreFingersSpread(LEAP_DIGIT* fingers, int fingerCount);
-
+	static bool AreFingersSpread(LEAP_HAND* hand);
 
 	static bool HPalmCrossDetectedInHistory(bool isLeftSupportHand);
 	static bool JCurveDetectedInHistory(bool isLeftSupportHand);
-
 
 	static std::string GestureToString(GestureType type);
 };

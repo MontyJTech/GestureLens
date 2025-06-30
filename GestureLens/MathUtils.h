@@ -6,8 +6,8 @@
 
 class MathUtils {
 public:
-	inline static const float PERPENDICULARITY_THRESHOLD = 0.7f;
-	static inline const LEAP_VECTOR UP{0, -1, 0}; // Assumes head mounted
+	inline static const float PERPENDICULARITY_THRESHOLD = 0.4f;
+	static inline const LEAP_VECTOR UP{0, -1, 0}; // Assumes head mounted, y = 1 for desk mounted mode
 
 	static LEAP_VECTOR Normalize(const LEAP_VECTOR& v) {
 		float length = Magnitude(v);
@@ -60,7 +60,7 @@ public:
 	static bool VectorsPerpendicular(LEAP_VECTOR v1, LEAP_VECTOR v2) {
 		float palmNormalSimilarity = MathUtils::CosSimilarity(v1, v2);
 
-		return 0 - PERPENDICULARITY_THRESHOLD < palmNormalSimilarity &&
-			palmNormalSimilarity < 0 + PERPENDICULARITY_THRESHOLD;
+		return -PERPENDICULARITY_THRESHOLD < palmNormalSimilarity &&
+			palmNormalSimilarity < PERPENDICULARITY_THRESHOLD;
 	}
 };

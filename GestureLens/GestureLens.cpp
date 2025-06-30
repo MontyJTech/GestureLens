@@ -1,20 +1,12 @@
 #include <iostream>
-#include "LeapC.h"
-#include <thread>
-#include <chrono>
 #include <conio.h>
-#include <vector>
 
+#include "LeapC.h"
 #include "GestureUtils.h"
 #include "LetterList.h"
 
 bool InitializeLeapDevice(LEAP_CONNECTION* connection, LEAP_CONNECTION_MESSAGE* message);
 bool UserInput();
-bool ShouldPrintLetter(const Letter* prevLetter, const Letter* nextLetter);
-
-const int charResetMaxCount = 100;
-int charResetCounter = 0;
-bool charReset = true;
 
 int main()
 {
@@ -64,23 +56,18 @@ int main()
 					}
 				}
 
-				
 				if(foundLetter->GetChar() != '-') {
 					std::cout << foundLetter->GetChar();
 					prevLetter = foundLetter;
 					frameCounter = 0;
 				}
-				//if (ShouldPrintLetter(prevLetter, foundLetter)) {
-				//	prevLetter = foundLetter;
-				//	charReset = false;
-				//	std::cout << foundLetter->GetChar();
-				//}
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		else {
+			//cout a message that basically says "yo there's a problem..."
+		}
 	}
 
-	// Clean up
 	LeapCloseConnection(connection);
 	LeapDestroyConnection(connection);
 
@@ -130,37 +117,4 @@ bool UserInput() {
 		}
 	}
 	return false;
-}
-
-bool ShouldPrintLetter(const Letter* prevLetter, const Letter* nextLetter) {
-
-	if (nextLetter->GetChar() != '-') {
-		if (nextLetter->GetChar() != prevLetter->GetChar()) {
-			return true;
-		}
-		else if (charReset) {
-			return true;
-		}
-		else if(charResetCounter == charResetMaxCount){
-			charResetCounter = 0;
-			charReset = true;
-			return true;
-		}
-		else{
-			charResetCounter++;
-			return false;
-		}
-	}
-	else {
-		if (!charReset) {
-			if (charResetCounter == charResetMaxCount) {
-				charResetCounter = 0;
-				charReset = true;
-			}
-			else {
-				charResetCounter++;
-			}
-		}
-		return false;
-	}
 }
